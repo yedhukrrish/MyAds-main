@@ -4,49 +4,58 @@ class SignUp2Response {
   String ageGroup;
   String incomeGroup;
   String mobile;
+  String email;
   String postalCode;
   String country;
-  String userid;
   String gender;
-  String error;
+  List<dynamic> userIn, streamIn;
+  String playback;
 
   SignUp2Response(
-      {this.firstName,
-        this.lastName,
-        this.ageGroup,
-        this.incomeGroup,
-        this.mobile,
-        this.postalCode,
-        this.country,
-        this.userid,
-        this.gender,
-        this.error});
+      this.firstName,
+      this.lastName,
+      this.ageGroup,
+      this.incomeGroup,
+      this.mobile,
+      this.email,
+      this.postalCode,
+      this.country,
+      this.gender,
+      this.userIn,
+      this.streamIn,
+      this.playback);
 
   SignUp2Response.fromJson(Map<String, dynamic> json) {
-    firstName = json['first_name'];
+    print("GOT USer");
+    print(json);
+    firstName = json['name'];
     lastName = json['last_name'];
     ageGroup = json['age_group'];
     incomeGroup = json['income_group'];
     mobile = json['mobile'];
     postalCode = json['postal_code'];
     country = json['country'];
-    userid = json['userid'];
     gender = json['gender'];
-    error = json['error'];
+    playback = json['playback_option'];
+    print(playback);
+    userIn = json['user_intresets'];
+    print(userIn);
+    streamIn = json['streaming_lst'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['first_name'] = this.firstName;
-    data['last_name'] = this.lastName;
-    data['age_group'] = this.ageGroup;
-    data['income_group'] = this.incomeGroup;
-    data['mobile'] = this.mobile;
-    data['postal_code'] = this.postalCode;
-    data['country'] = this.country;
-    data['userid'] = this.userid;
-    data['gender'] = this.gender;
-    data['error'] = this.error;
-    return data;
+    final Map<String, dynamic> json = new Map<String, dynamic>();
+    json['name'] = this.firstName;
+    json['last_name'] = this.lastName;
+    json['age_group'] = this.ageGroup;
+    json['income_group'] = this.incomeGroup;
+    json['mobile'] = this.mobile;
+    json['postal_code'] = this.postalCode;
+    json['country'] = this.country;
+    json['gender'] = this.gender;
+    json['playback_option'] = this.playback;
+    json['user_intresets'] = this.userIn;
+    json['streaming_lst'] = this.streamIn;
+    return json;
   }
 }

@@ -176,7 +176,10 @@ class _SettingScreenState extends BaseState<SettingScreen> {
                   tilePadding: EdgeInsets.only(left: 40.0),
                   // title: _expansionTileButton(MyStrings.updatePassword),
                   title: InkWell(
-                    onTap: () {
+                    onTap: () async {
+                      await SharedPrefManager.instance
+                          .setString("settingsInterestIntent", (1).toString())
+                          .whenComplete(() => print("SetInterestIntentToggler True"));
                       Navigator.of(context).push(PageRouteBuilder(
                           pageBuilder: (_, __, ___) => new InterestScreen()));
                       // Navigator.push(context, MaterialPageRoute(builder: (context) => InterestScreen()));
@@ -585,37 +588,34 @@ class _SettingScreenState extends BaseState<SettingScreen> {
                 ),
               )),
           new PopupMenuDivider(height: 3.0),
-          new PopupMenuItem<String>(
-              value: 'value05',
-              child: InkWell(
-                onTap: () async {
-                  await SharedPrefManager.instance
-                      .setString(Constants.userEmail, null)
-                      .whenComplete(() => print(
-                      "user logged out . set to null"));
-                  await SharedPrefManager.instance
-                      .setString(Constants.password, null)
-                      .whenComplete(() => print(
-                      "user logged out . set to null"));
-                  Navigator.of(subcontext).push(PageRouteBuilder(
-                      pageBuilder: (_, __, ___) => new WelcomeScreen()));
+            new PopupMenuItem<String>(
+                value: 'value05',
+                child: InkWell(
+                  onTap: () async {
+                    await SharedPrefManager.instance
+                        .clearAll()
+                        .whenComplete(
+                            () => print("All set to null"));
 
-                  // Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //         builder: (context) => ChartsDemo()));
-                },
-                child: new Text(
-                  'Logout',
-                  style: MyStyles.robotoMedium16.copyWith(
-                      letterSpacing: 1.0,
-                      color: MyColors.black,
-                      fontWeight: FontWeight.w100),
-                ),
-              ))
+                    Navigator.of(subcontext).push(PageRouteBuilder(
+                        pageBuilder: (_, __, ___) => new WelcomeScreen()));
+
+                    // Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //         builder: (context) => ChartsDemo()));
+                  },
+                  child: new Text(
+                    'Logout',
+                    style: MyStyles.robotoMedium16.copyWith(
+                        letterSpacing: 1.0,
+                        color: MyColors.black,
+                        fontWeight: FontWeight.w100),
+                  ),
+                ))
         ];
         },
-        onSelected: (String value) {
+        onSelected: (String value) async {
           if (value == 'value02') {
             Navigator.of(subcontext).push(PageRouteBuilder(
                 pageBuilder: (_, __, ___) => new SettingScreen()));
@@ -627,6 +627,10 @@ class _SettingScreenState extends BaseState<SettingScreen> {
                 pageBuilder: (_, __, ___) => new ChartsDemo()));
           }
           else if (value == 'value05') {
+            await SharedPrefManager.instance
+                .clearAll()
+                .whenComplete(
+                    () => print("All set to null"));
             Navigator.of(subcontext).push(PageRouteBuilder(
                 pageBuilder: (_, __, ___) => new WelcomeScreen()));
           }

@@ -1,5 +1,4 @@
-class Endpoints{
-
+class Endpoints {
   static final String getVideos = "get-video.php";
   static final String signIn = "user-login.php";
   static final String updateProfile = "update-user-det.php";
@@ -13,6 +12,5 @@ class Endpoints{
   static final String updateTimeBlns = "update-balance-pause.php";
   static final String updateStream = "update-stream.php";
   static final String updatereaction = "add-reaction.php";
-
-
+  static final String userDetails = "user-details.php";
 }

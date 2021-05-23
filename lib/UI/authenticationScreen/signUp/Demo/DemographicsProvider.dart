@@ -25,11 +25,18 @@ class DemographicsProvider extends BaseProvider {
   initialProvider() async {
     String emailid =
         await SharedPrefManager.instance.getString(Constants.userEmail);
-    firstnameController = TextEditingController();
-    lastnameController = TextEditingController();
+    String fname, lname, mobile, pc;
+    fname = await SharedPrefManager.instance.getString(Constants.firstName);
+    lname = await SharedPrefManager.instance.getString(Constants.lastName);
+    mobile = await SharedPrefManager.instance.getString(Constants.userMobile);
+    pc = await SharedPrefManager.instance.getString(Constants.userPostalCode);
+    print("Demographics");
+    print(emailid + fname + lname + pc);
+    firstnameController = TextEditingController(text: fname);
+    lastnameController = TextEditingController(text: lname);
     emailController = TextEditingController(text: emailid);
-    mobileController = TextEditingController();
-    pcController = TextEditingController();
+    mobileController = TextEditingController(text: mobile);
+    pcController = TextEditingController(text: pc);
     _autoValidate = false;
   }
 
@@ -46,9 +53,7 @@ class DemographicsProvider extends BaseProvider {
         .post(Endpoints.getInterest)
         .then((response) => successResponse(response))
         .catchError((onError) {
-      print("5");
       listener.onFailure(DioErrorUtil.handleErrors(onError));
-      print("6");
     });
   }
 
@@ -109,9 +114,7 @@ class DemographicsProvider extends BaseProvider {
         .post(Endpoints.signUp2, queryParameters: qParams)
         .then((response) => successResponse2(response))
         .catchError((onError) {
-      print("5");
       listener.onFailure(DioErrorUtil.handleErrors(onError));
-      print("6");
     });
   }
 

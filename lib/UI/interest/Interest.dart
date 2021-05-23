@@ -16,6 +16,7 @@ import 'package:myads_app/model/response/interests/updateInterestResponse.dart';
 import 'package:myads_app/utils/code_snippet.dart';
 import 'package:myads_app/utils/shared_pref_manager.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../BarChart.dart';
 import '../CheckMyCoupons.dart';
@@ -32,10 +33,14 @@ class _InterestScreenState extends BaseState<InterestScreen> {
 
   List<Interests> interestList = <Interests>[];
   BuildContext subcontext;
+  SharedPreferences sharedPrefs;
 
   @override
   void initState() {
     super.initState();
+    SharedPreferences.getInstance().then((prefs) {
+      setState(() => sharedPrefs = prefs);
+    });
     _interestProvider = Provider.of<InterestProvider>(context, listen: false);
     _interestProvider.listener = this;
     _interestProvider.performGetInterest();
@@ -44,7 +49,7 @@ class _InterestScreenState extends BaseState<InterestScreen> {
 
   int c = 0;
   @override
-  void onSuccess(any, {int reqId}) {
+  Future<void> onSuccess(any, {int reqId}) async {
     ProgressBar.instance.hideProgressBar();
     super.onSuccess(any);
     switch (reqId) {
@@ -67,9 +72,18 @@ class _InterestScreenState extends BaseState<InterestScreen> {
       case ResponseIds.UPDATE_INTEREST:
         UpdateInterestResponse _response = any as UpdateInterestResponse;
         if (_response.intrests.isNotEmpty) {
-          print("success");
-          Navigator.of(context).push(PageRouteBuilder(
-              pageBuilder: (_, __, ___) => new StreamingGoals()));
+          String SettingsIntent =
+              await sharedPrefs.getString("settingsInterestIntent");
+          if ((SettingsIntent != null) && (int.parse(SettingsIntent) != 0)) {
+            await SharedPrefManager.instance
+                .setString("settingsInterestIntent", (0).toString());
+            print("success");
+            Navigator.of(context).push(PageRouteBuilder(
+                pageBuilder: (_, __, ___) => new SettingScreen()));
+          } else {
+            Navigator.of(context).push(PageRouteBuilder(
+                pageBuilder: (_, __, ___) => new StreamingGoals()));
+          }
         } else {
           print("failure");
           CodeSnippet.instance.showMsg("Failed");
@@ -213,6 +227,7 @@ class _InterestScreenState extends BaseState<InterestScreen> {
       ),
     );
   }
+
   Widget _DividerPopMenu() {
     return new PopupMenuButton<String>(
         offset: const Offset(0, 30),
@@ -222,7 +237,7 @@ class _InterestScreenState extends BaseState<InterestScreen> {
           color: MyColors.accentsColors,
         ),
         itemBuilder: (BuildContext context) {
-          subcontext=context;
+          subcontext = context;
 
           return <PopupMenuEntry<String>>[
             new PopupMenuItem<String>(
@@ -313,13 +328,10 @@ class _InterestScreenState extends BaseState<InterestScreen> {
                 child: InkWell(
                   onTap: () async {
                     await SharedPrefManager.instance
-                        .setString(Constants.userEmail, null)
-                        .whenComplete(() => print(
-                        "user logged out . set to null"));
-                    await SharedPrefManager.instance
-                        .setString(Constants.password, null)
-                        .whenComplete(() => print(
-                        "user logged out . set to null"));
+                        .clearAll()
+                        .whenComplete(
+                            () => print("All set to null"));
+
                     Navigator.of(subcontext).push(PageRouteBuilder(
                         pageBuilder: (_, __, ___) => new WelcomeScreen()));
 
@@ -338,7 +350,7 @@ class _InterestScreenState extends BaseState<InterestScreen> {
                 ))
           ];
         },
-        onSelected: (String value) {
+        onSelected: (String value) async {
           if (value == 'value02') {
             Navigator.of(subcontext).push(PageRouteBuilder(
                 pageBuilder: (_, __, ___) => new SettingScreen()));
@@ -348,16 +360,18 @@ class _InterestScreenState extends BaseState<InterestScreen> {
           } else if (value == 'value04') {
             Navigator.of(subcontext).push(PageRouteBuilder(
                 pageBuilder: (_, __, ___) => new ChartsDemo()));
-          }
-          else if (value == 'value05') {
+          } else if (value == 'value05') {
+            await SharedPrefManager.instance
+                .clearAll()
+                .whenComplete(
+                    () => print("All set to null"));
             Navigator.of(subcontext).push(PageRouteBuilder(
+
                 pageBuilder: (_, __, ___) => new WelcomeScreen()));
           }
         });
   }
-
 }
-
 
 Widget _submitButton(String buttonName) {
   return Container(

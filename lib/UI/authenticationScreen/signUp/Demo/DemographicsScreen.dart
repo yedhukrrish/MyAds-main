@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:grouped_buttons/grouped_buttons.dart';
 import 'package:menu_button/menu_button.dart';
 import 'package:myads_app/Constants/colors.dart';
-import 'package:myads_app/Constants/constants.dart';
 import 'package:myads_app/Constants/dimens.dart';
 import 'package:myads_app/Constants/images.dart';
 import 'package:myads_app/Constants/response_ids.dart';
@@ -103,7 +102,7 @@ class _DemographicsScreenState extends BaseState<DemographicsScreen> {
           color: MyColors.accentsColors,
         ),
         itemBuilder: (BuildContext context) {
-          subcontext=context;
+          subcontext = context;
 
           return <PopupMenuEntry<String>>[
             new PopupMenuItem<String>(
@@ -193,14 +192,9 @@ class _DemographicsScreenState extends BaseState<DemographicsScreen> {
                 value: 'value05',
                 child: InkWell(
                   onTap: () async {
-                    await SharedPrefManager.instance
-                        .setString(Constants.userEmail, null)
-                        .whenComplete(() => print(
-                        "user logged out . set to null"));
-                    await SharedPrefManager.instance
-                        .setString(Constants.password, null)
-                        .whenComplete(() => print(
-                        "user logged out . set to null"));
+                    await SharedPrefManager.instance.clearAll()
+                        .whenComplete(() => print("All set to null"));
+
                     Navigator.of(subcontext).push(PageRouteBuilder(
                         pageBuilder: (_, __, ___) => new WelcomeScreen()));
 
@@ -219,7 +213,7 @@ class _DemographicsScreenState extends BaseState<DemographicsScreen> {
                 ))
           ];
         },
-        onSelected: (String value) {
+        onSelected: (String value) async {
           if (value == 'value02') {
             Navigator.of(subcontext).push(PageRouteBuilder(
                 pageBuilder: (_, __, ___) => new SettingScreen()));
@@ -229,8 +223,10 @@ class _DemographicsScreenState extends BaseState<DemographicsScreen> {
           } else if (value == 'value04') {
             Navigator.of(subcontext).push(PageRouteBuilder(
                 pageBuilder: (_, __, ___) => new ChartsDemo()));
-          }
-          else if (value == 'value05') {
+          } else if (value == 'value05') {
+            await SharedPrefManager.instance
+                .clearAll()
+                .whenComplete(() => print("All set to null"));
             Navigator.of(subcontext).push(PageRouteBuilder(
                 pageBuilder: (_, __, ___) => new WelcomeScreen()));
           }
@@ -308,11 +304,12 @@ class _DemographicsScreenState extends BaseState<DemographicsScreen> {
         break;
       case ResponseIds.SIGN_UP2:
         SignUp2Response _response = any as SignUp2Response;
-        if (_response.userid != null) {
-          String SettingsIntent = await sharedPrefs.getString("settingsIntent");
+        if (_response.email != null) {
+          String SettingsIntent =
+              await sharedPrefs.getString("settingsInterestIntent");
           if ((SettingsIntent != null) && (int.parse(SettingsIntent) != 0)) {
             await SharedPrefManager.instance
-                .setString("settingsIntent", (0).toString());
+                .setString("settingsInterestIntent", (0).toString());
             Navigator.of(context).push(PageRouteBuilder(
                 pageBuilder: (_, __, ___) => new SettingScreen()));
           } else {

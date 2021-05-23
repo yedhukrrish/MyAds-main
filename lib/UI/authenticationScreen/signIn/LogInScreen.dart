@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:myads_app/Constants/colors.dart';
 import 'package:myads_app/Constants/constants.dart';
@@ -12,6 +13,9 @@ import 'package:myads_app/UI/authenticationScreen/signIn/loginProvider.dart';
 import 'package:myads_app/UI/dashboardScreen/DashBoard.dart';
 import 'package:myads_app/base/base_state.dart';
 import 'package:myads_app/model/response/authentication/login_response.dart';
+import 'package:myads_app/model/response/authentication/signup2Response.dart';
+import 'package:myads_app/service/api_manager.dart';
+import 'package:myads_app/service/endpoints.dart';
 import 'package:myads_app/utils/code_snippet.dart';
 import 'package:myads_app/utils/shared_pref_manager.dart';
 import 'package:provider/provider.dart';
@@ -186,6 +190,36 @@ class _LoginScreenState extends BaseState<LoginScreen> {
         }),
       ),
     );
+  }
+
+  Future<void> getSharedPrefForUser(String uid) async {
+    Map<String, String> qParams = {'u': uid};
+    await ApiManager()
+        .getDio(isJsonType: false)
+        .post(Endpoints.userDetails, queryParameters: qParams)
+        .then((response) => successResponse2(response))
+        .catchError((onError) {
+      onError.toString();
+      print("WelcomeScreen SharedprefCall");
+    });
+  }
+
+  successResponse2(Response response) async {
+    SignUp2Response _response = SignUp2Response.fromJson(response.data);
+    await SharedPrefManager.instance
+        .setString(Constants.firstName, _response.firstName);
+    await SharedPrefManager.instance
+        .setString(Constants.lastName, _response.lastName);
+    await SharedPrefManager.instance
+        .setString(Constants.userEmail, _response.email);
+    await SharedPrefManager.instance
+        .setString(Constants.userMobile, _response.mobile);
+    await SharedPrefManager.instance
+        .setString(Constants.userPostalCode, _response.postalCode);
+    await SharedPrefManager.instance
+        .setString(Constants.agegroup, _response.ageGroup);
+    print(_response.firstName + _response.email);
+    print("Set all sharefdpref in login");
   }
 }
 

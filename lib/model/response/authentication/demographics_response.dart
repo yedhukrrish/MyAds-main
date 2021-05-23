@@ -8,13 +8,14 @@ class DemoGraphicsResponse {
 
   DemoGraphicsResponse(
       {this.interests,
-        this.generGroups,
-        this.ageGroups,
-        this.incomeGroups,
-        this.streamList,
-        this.countryList});
+      this.generGroups,
+      this.ageGroups,
+      this.incomeGroups,
+      this.streamList,
+      this.countryList});
 
   DemoGraphicsResponse.fromJson(Map<String, dynamic> json) {
+    print(json);
     if (json['interests'] != null) {
       // ignore: deprecated_member_use
       interests = new List<Interests>();

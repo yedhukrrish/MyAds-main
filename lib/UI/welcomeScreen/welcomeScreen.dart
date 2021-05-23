@@ -1,3 +1,4 @@
+import 'package:dio/src/response.dart';
 import 'package:flutter/material.dart';
 import 'package:myads_app/Constants/colors.dart';
 import 'package:myads_app/Constants/constants.dart';
@@ -8,6 +9,9 @@ import 'package:myads_app/Constants/styles.dart';
 import 'package:myads_app/UI/authenticationScreen/signIn/LogInScreen.dart';
 import 'package:myads_app/UI/authenticationScreen/signUp/SignUpScreen.dart';
 import 'package:myads_app/UI/dashboardScreen/DashBoard.dart';
+import 'package:myads_app/model/response/authentication/signup2Response.dart';
+import 'package:myads_app/service/api_manager.dart';
+import 'package:myads_app/service/endpoints.dart';
 import 'package:myads_app/utils/shared_pref_manager.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -154,9 +158,49 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         await SharedPrefManager.instance.getString(Constants.userEmail);
     String pass =
         await SharedPrefManager.instance.getString(Constants.password);
-    if (emailid != null && pass != null) {
+    String uid = await SharedPrefManager.instance.getString(Constants.userId);
+    print(emailid + pass + uid);
+    getSharedPrefForUser(uid);
+    if (emailid != null && pass != null && uid != null) {
       Navigator.of(context).push(
           PageRouteBuilder(pageBuilder: (_, __, ___) => new DashBoardScreen()));
     }
   }
+
+  Future<void> getSharedPrefForUser(String uid) async {
+    Map<String, String> qParams = {'u': uid};
+    await ApiManager()
+        .getDio(isJsonType: false)
+        .post(Endpoints.userDetails, queryParameters: qParams)
+        .then((response) => successResponse2(response))
+        .catchError((onError) {
+      print(onError);
+      print("WelcomeScreen SharedprefCall");
+    });
+  }
+}
+
+successResponse2(Response response) async {
+  SignUp2Response _response = SignUp2Response.fromJson(response.data);
+  print(_response.firstName +
+      " " +
+      _response.lastName +
+      " " +
+      _response.mobile +
+      " " +
+      _response.postalCode +
+      " " +
+      _response.ageGroup +
+      " ");
+  await SharedPrefManager.instance
+      .setString(Constants.firstName, _response.firstName);
+  await SharedPrefManager.instance
+      .setString(Constants.lastName, _response.lastName);
+  await SharedPrefManager.instance
+      .setString(Constants.userMobile, _response.mobile);
+  await SharedPrefManager.instance
+      .setString(Constants.userPostalCode, _response.postalCode);
+  await SharedPrefManager.instance
+      .setString(Constants.agegroup, _response.ageGroup);
+  print("Set all sharefdpref in login");
 }

@@ -435,13 +435,10 @@ BuildContext subcontext;
                 child: InkWell(
                   onTap: () async {
                     await SharedPrefManager.instance
-                        .setString(Constants.userEmail, null)
-                        .whenComplete(() => print(
-                        "user logged out . set to null"));
-                    await SharedPrefManager.instance
-                        .setString(Constants.password, null)
-                        .whenComplete(() => print(
-                        "user logged out . set to null"));
+                        .clearAll()
+                        .whenComplete(
+                            () => print("All set to null"));
+
                     Navigator.of(subcontext).push(PageRouteBuilder(
                         pageBuilder: (_, __, ___) => new WelcomeScreen()));
 
@@ -460,7 +457,7 @@ BuildContext subcontext;
                 ))
           ];
         },
-        onSelected: (String value) {
+        onSelected: (String value) async {
           if (value == 'value02') {
             Navigator.of(subcontext).push(PageRouteBuilder(
                 pageBuilder: (_, __, ___) => new SettingScreen()));
@@ -472,6 +469,10 @@ BuildContext subcontext;
                 pageBuilder: (_, __, ___) => new ChartsDemo()));
           }
           else if (value == 'value05') {
+            await SharedPrefManager.instance
+                .clearAll()
+                .whenComplete(
+                    () => print("All set to null"));
             Navigator.of(subcontext).push(PageRouteBuilder(
                 pageBuilder: (_, __, ___) => new WelcomeScreen()));
           }
