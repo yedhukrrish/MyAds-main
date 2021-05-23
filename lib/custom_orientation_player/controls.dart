@@ -1,6 +1,6 @@
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:myads_app/Constants/colors.dart';
 import 'package:myads_app/Constants/images.dart';
 import 'package:myads_app/Constants/strings.dart';
@@ -15,12 +15,18 @@ import 'data_manager.dart';
 
 class CustomOrientationControls extends StatelessWidget {
   const CustomOrientationControls(
-      {Key key, this.iconSize = 20, this.fontSize = 12, this.dataManager, this.videoId})
+      {Key key,
+      this.iconSize = 20,
+      this.fontSize = 12,
+      this.dataManager,
+      this.videoId,
+      this.yetToWatch})
       : super(key: key);
   final double iconSize;
   final double fontSize;
   final DataManager dataManager;
   final String videoId;
+  final String yetToWatch;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +41,9 @@ class CustomOrientationControls extends StatelessWidget {
               child: FlickVideoBuffer(
                 child: FlickAutoHideChild(
                   showIfVideoNotInitialized: false,
-                  child: LandscapePlayToggle(VideoId: this.videoId,),
+                  child: LandscapePlayToggle(
+                    VideoId: this.videoId,
+                  ),
                 ),
               ),
             ),
@@ -69,7 +77,6 @@ class CustomOrientationControls extends StatelessWidget {
                       Expanded(
                         child: Container(),
                       ),
-
                       SizedBox(
                         width: 10,
                       ),
@@ -89,12 +96,12 @@ class CustomOrientationControls extends StatelessWidget {
         ),
         Positioned(
             right: 1,
-            top: MediaQuery.of(context).size.height/3.4,
-            child:Column(
+            top: MediaQuery.of(context).size.height / 3.4,
+            child: Column(
               children: [
                 Container(
                   height: 100.0,
-                  width: 200.0,
+                  width: 240.0,
                   color: MyColors.primaryColor.withOpacity(0.5),
                   child: Center(
                     child: Column(
@@ -113,19 +120,27 @@ class CustomOrientationControls extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             ValueListenableBuilder(
-                              valueListenable: flickVideoManager.videoPlayerController,
-                              builder: (context, VideoPlayerValue value, child) {
+                              valueListenable:
+                                  flickVideoManager.videoPlayerController,
+                              builder:
+                                  (context, VideoPlayerValue value, child) {
                                 //Do Something with the value.
-                                return Text(value.position.toString().substring(0,7), style: MyStyles.robotoLight60.copyWith(
-                                  letterSpacing: 1.0,
-                                  color: MyColors.white,),);
+
+                                return Text(
+                                  value.position.toString().substring(0, 7),
+                                  style: MyStyles.robotoLight60.copyWith(
+                                    letterSpacing: 1.0,
+                                    color: MyColors.white,
+                                  ),
+                                );
                               },
                             ),
                           ],
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(left:18.0),
-                          child: Text(MyStrings.Watched,
+                          padding: const EdgeInsets.only(left: 18.0),
+                          child: Text(
+                            MyStrings.Watched,
                             style: MyStyles.robotoLight12.copyWith(
                                 letterSpacing: 1.0,
                                 color: MyColors.colorLight,
@@ -138,54 +153,94 @@ class CustomOrientationControls extends StatelessWidget {
                 ),
                 Container(
                   height: 100.0,
-                  width: 200.0,
+                  width: 240.0,
                   color: MyColors.accentsColors.withOpacity(0.5),
                   child: Center(
-                      child:Column(
-                        children: [
-                          ValueListenableBuilder(
-                            valueListenable: flickVideoManager.videoPlayerController,
-                            builder: (context, VideoPlayerValue value, child) {
-                              //Do Something with the value.
-                              return Text("\$"+value.position.toString().substring(2,7), style: MyStyles.robotoLight60.copyWith(
-                                letterSpacing: 1.0,
-                                color: MyColors.white,),);
-                            },
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left:18.0),
-                            child: Text(MyStrings.yearned,
-                              style: MyStyles.robotoLight12.copyWith(
-                                  letterSpacing: 1.0,
-                                  color: MyColors.colorLight,
-                                  fontWeight: FontWeight.w100),
+                      child: Column(
+                    children: [
+                      ValueListenableBuilder(
+                        valueListenable:
+                            flickVideoManager.videoPlayerController,
+                        builder: (context, VideoPlayerValue value, child) {
+                          //Do Something with the value.
+                          String a = value.position.toString().substring(0, 7);
+                          Duration position =
+                              flickVideoManager.videoPlayerValue.position;
+                          String positionInSeconds = position != null
+                              ? (position -
+                                      Duration(minutes: position.inMinutes))
+                                  .inSeconds
+                                  .toString()
+                                  .padLeft(2, '0')
+                              : null;
+                          String textPosition = position != null
+                              ? '${position.inMinutes}.$positionInSeconds'
+                              : '0.00';
+                          var format = DateFormat("HH:mm:ss");
+                          var one = format.parse(a);
+                          var two = format.parse(yetToWatch);
+                          print(one.toString() +
+                              " " +
+                              two.difference(one).toString());
+                          String tempYetToWatch =
+                              (two.difference(one).toString()).substring(0, 8);
+                          return Text(
+                            tempYetToWatch,
+                            style: MyStyles.robotoLight60.copyWith(
+                              letterSpacing: 1.0,
+                              color: MyColors.white,
                             ),
-                          ),
-                        ],
-                      )
-                  ),
+                          );
+                        },
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 18.0),
+                        child: Text(
+                          MyStrings.yearned,
+                          style: MyStyles.robotoLight12.copyWith(
+                              letterSpacing: 1.0,
+                              color: MyColors.colorLight,
+                              fontWeight: FontWeight.w100),
+                        ),
+                      ),
+                    ],
+                  )),
                 ),
               ],
-            )
-        ),
+            )),
         Padding(
-          padding: const EdgeInsets.only(left:50.0,right: 50.0, top:310.0),
+          padding: const EdgeInsets.only(left: 50.0, right: 50.0, top: 310.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               InkWell(
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => WebViewScreen(url: "https://www.google.com/",title: "Google",)));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => WebViewScreen(
+                                  url: "https://www.google.com/",
+                                  title: "Google",
+                                )));
                   },
                   child: Image.asset(MyImages.group2)),
-              SizedBox(width: 15,),
+              SizedBox(
+                width: 15,
+              ),
               Image.asset(MyImages.group1),
-              SizedBox(width: 15,),
+              SizedBox(
+                width: 15,
+              ),
               Image.asset(MyImages.group3),
-              SizedBox(width: 15,),
+              SizedBox(
+                width: 15,
+              ),
               InkWell(
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => SurveyScreen()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SurveyScreen()));
                   },
                   child: Image.asset(MyImages.group4)),
             ],

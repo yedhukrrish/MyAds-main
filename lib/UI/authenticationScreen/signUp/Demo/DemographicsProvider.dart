@@ -23,13 +23,13 @@ class DemographicsProvider extends BaseProvider {
   List<CountryList> countryList;
   String type, agroup, igroup;
   initialProvider() async {
-    String emailid =
-        await SharedPrefManager.instance.getString(Constants.userEmail);
     String fname, lname, mobile, pc;
     fname = await SharedPrefManager.instance.getString(Constants.firstName);
     lname = await SharedPrefManager.instance.getString(Constants.lastName);
     mobile = await SharedPrefManager.instance.getString(Constants.userMobile);
     pc = await SharedPrefManager.instance.getString(Constants.userPostalCode);
+    String emailid =
+        await SharedPrefManager.instance.getString(Constants.userEmail);
     print("Demographics");
     print(emailid + fname + lname + pc);
     firstnameController = TextEditingController(text: fname);
@@ -96,8 +96,6 @@ class DemographicsProvider extends BaseProvider {
   }
 
   performSignUp2() async {
-    print("1");
-
     Map<String, String> qParams = {
       'agroup': agroup,
       "igroup": igroup,

@@ -16,6 +16,8 @@ class VideoResponse {
   String balanceReward;
   String reaction;
   Survey survey;
+  List<dynamic> badge;
+  SurveyDetails surveyDetails;
 
   VideoResponse(
       this.userId,
@@ -35,7 +37,9 @@ class VideoResponse {
       this.balanceTime,
       this.balanceReward,
       this.reaction,
-      this.survey);
+      this.survey,
+      this.badge,
+      this.surveyDetails);
 
   VideoResponse.fromJson(Map<String, dynamic> data) {
     userId = data['user_id'];
@@ -69,6 +73,7 @@ class VideoResponse {
           ":" +
           (timeFormatter.sec).toString();
     }
+
     //  toWatchtime=data['to_watch_time'];
     //  watchedtime=data['watched_time'];
 
@@ -86,6 +91,11 @@ class VideoResponse {
     if (data['survey'] != null) {
       survey = Survey.fromJson(data['survey']);
     }
+    badge = data['badge'];
+    print(badge);
+    print(data['survey_details']);
+    surveyDetails = SurveyDetails.fromJson(data['survey_details']);
+    print(surveyDetails);
   }
 
   Map<String, dynamic> toJson() {
@@ -108,6 +118,8 @@ class VideoResponse {
     data['balance_reward'] = this.balanceReward;
     data['reaction'] = this.reaction;
     data['survey'] = this.survey;
+    data['survey_details'] = this.surveyDetails;
+    data['badge'] = this.badge;
     return data;
   }
 }
@@ -169,6 +181,44 @@ class Survey {
     data['1'] = this.one;
     data['2'] = this.two;
     data['comment'] = this.comment;
+    return data;
+  }
+}
+
+class SurveyDetails {
+  String Name;
+  List<dynamic> questionsList;
+
+  SurveyDetails(this.Name, this.questionsList);
+
+  SurveyDetails.fromJson(Map<String, dynamic> json) {
+    Name = json["name"];
+    for (int i = 0; i < json["questions"].length - 1; i + 1) {
+      print(Questions.fromJson((json["questions"])[i]));
+      questionsList.add(Questions.fromJson((json["questions"])[i]));
+    }
+  }
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data["name"] = this.Name;
+    data["questions"] = this.questionsList;
+    return data;
+  }
+}
+
+class Questions {
+  String question, type;
+
+  Questions(this.question, this.type);
+
+  Questions.fromJson(Map<String, dynamic> json) {
+    question = json["question"];
+    type = json["type"];
+  }
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['question'] = this.question;
+    data['type'] = this.type;
     return data;
   }
 }

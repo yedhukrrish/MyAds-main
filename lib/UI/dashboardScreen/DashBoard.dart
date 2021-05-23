@@ -225,6 +225,8 @@ class _DashBoardScreenState extends BaseState<DashBoardScreen> {
                 : DashboardVideo(
                     videoUrl: videoUrl,
                     id: Videoid,
+                    watchTime: watchTime,
+                    productUrl: producturl,
                   ),
             SizedBox(height: 10),
             Stack(

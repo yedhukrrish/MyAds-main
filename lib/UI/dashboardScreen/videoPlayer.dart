@@ -1,16 +1,12 @@
-
 import 'package:flutter/material.dart';
 import 'package:myads_app/UI/portraitScreen/watchPortraitScreen.dart';
 import 'package:video_player/video_player.dart';
 
-
 class DashboardVideo extends StatefulWidget {
-  final String videoUrl,id;
-  DashboardVideo({this.videoUrl,this.id});
+  final String videoUrl, id, watchTime, productUrl;
+  DashboardVideo({this.videoUrl, this.id, this.watchTime, this.productUrl});
   @override
   _DashboardVideoState createState() => _DashboardVideoState();
-
- 
 }
 
 class _DashboardVideoState extends State<DashboardVideo> {
@@ -20,7 +16,7 @@ class _DashboardVideoState extends State<DashboardVideo> {
   void initState() {
     super.initState();
     _controller = VideoPlayerController.network(
-     widget.videoUrl,
+      widget.videoUrl,
       videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
     );
 
@@ -45,19 +41,27 @@ class _DashboardVideoState extends State<DashboardVideo> {
         Center(
           child: _controller.value.isInitialized
               ? AspectRatio(
-            aspectRatio: _controller.value.aspectRatio,
-            child: VideoPlayer(_controller),
-          )
+                  aspectRatio: _controller.value.aspectRatio,
+                  child: VideoPlayer(_controller),
+                )
               : Container(
-            height: 200,
-            child: Center(child: CircularProgressIndicator()),
-          ),
+                  height: 200,
+                  child: Center(child: CircularProgressIndicator()),
+                ),
         ),
         Positioned(
-          top:100,
+          top: 100,
           child: GestureDetector(
-            onTap: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context) => WatchPortrait(videoUrl: widget.videoUrl,VideoId: widget.id,)));
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => WatchPortrait(
+                            videoUrl: widget.videoUrl,
+                            VideoId: widget.id,
+                            watchtime: widget.watchTime,
+                            productUrl: widget.productUrl,
+                          )));
             },
             child: Center(
               child: Icon(
@@ -73,7 +77,3 @@ class _DashboardVideoState extends State<DashboardVideo> {
     );
   }
 }
-
-
-
-

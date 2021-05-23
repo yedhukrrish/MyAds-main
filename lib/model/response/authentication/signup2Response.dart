@@ -10,7 +10,7 @@ class SignUp2Response {
   String gender;
   List<dynamic> userIn, streamIn;
   String playback;
-
+//Found??
   SignUp2Response(
       this.firstName,
       this.lastName,
@@ -33,6 +33,7 @@ class SignUp2Response {
     ageGroup = json['age_group'];
     incomeGroup = json['income_group'];
     mobile = json['mobile'];
+    email = json['email'];
     postalCode = json['postal_code'];
     country = json['country'];
     gender = json['gender'];
@@ -50,6 +51,7 @@ class SignUp2Response {
     json['age_group'] = this.ageGroup;
     json['income_group'] = this.incomeGroup;
     json['mobile'] = this.mobile;
+    json['email'] = this.email;
     json['postal_code'] = this.postalCode;
     json['country'] = this.country;
     json['gender'] = this.gender;

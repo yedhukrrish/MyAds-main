@@ -11,11 +11,11 @@ import 'package:myads_app/Constants/response_ids.dart';
 import 'package:myads_app/Constants/strings.dart';
 import 'package:myads_app/Constants/styles.dart';
 import 'package:myads_app/UI/SurveyScreen.dart';
+import 'package:myads_app/UI/Widgets/clipper.dart';
+import 'package:myads_app/UI/Widgets/progressbar.dart';
 import 'package:myads_app/UI/dashboardScreen/DashBoard.dart';
 import 'package:myads_app/UI/portraitScreen/watchPortraitProvider.dart';
 import 'package:myads_app/UI/webview.dart';
-import 'package:myads_app/UI/Widgets/clipper.dart';
-import 'package:myads_app/UI/Widgets/progressbar.dart';
 import 'package:myads_app/UI/welcomeScreen/welcomeScreen.dart';
 import 'package:myads_app/base/base_state.dart';
 import 'package:myads_app/custom_orientation_player/controls.dart';
@@ -26,24 +26,24 @@ import 'package:myads_app/utils/shared_pref_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+
 import '../BarChart.dart';
 import '../CheckMyCoupons.dart';
 import '../settings/SettingScreen.dart';
 
-
 class WatchPortrait extends StatefulWidget {
-  final String videoUrl,VideoId,watchtime,productUrl;
-  WatchPortrait({this.videoUrl,this.VideoId,this.watchtime,this.productUrl});
+  final String videoUrl, VideoId, watchtime, productUrl;
+  WatchPortrait({this.videoUrl, this.VideoId, this.watchtime, this.productUrl});
 
   @override
-  _WatchPortraitState createState() =>
-      _WatchPortraitState();
+  _WatchPortraitState createState() => _WatchPortraitState();
 }
 
 class _WatchPortraitState extends BaseState<WatchPortrait> {
   FlickManager flickManager;
   DataManager dataManager;
   BuildContext subcontext;
+  String tempWatchTime, tempYetToWatch;
   // List<String> urls = (mockData["items"] as List)
   //     .map<String>((item) => item["trailer_url"])
   //     .toList();
@@ -52,16 +52,17 @@ class _WatchPortraitState extends BaseState<WatchPortrait> {
   void initState() {
     super.initState();
     flickManager = FlickManager(
-        videoPlayerController: VideoPlayerController.network(
-         widget.videoUrl        ),
-        onVideoEnd: () {
-
-        });
+        videoPlayerController: VideoPlayerController.network(widget.videoUrl),
+        onVideoEnd: () {});
     print(flickManager.flickVideoManager.videoPlayerValue.position.inSeconds);
     print(flickManager.flickVideoManager.videoPlayerValue.duration.inSeconds);
-    _watchPortraitProvider = Provider.of<WatchPortraitProvider>(context,listen: false);
-    _watchPortraitProvider.listener= this;
-    dataManager = DataManager(flickManager: flickManager, urls: 'https://github.com/GeekyAnts/flick-video-player-demo-videos/blob/master/example/the_valley_compressed.mp4?raw=true');
+    _watchPortraitProvider =
+        Provider.of<WatchPortraitProvider>(context, listen: false);
+    _watchPortraitProvider.listener = this;
+    dataManager = DataManager(
+        flickManager: flickManager,
+        urls:
+            'https://github.com/GeekyAnts/flick-video-player-demo-videos/blob/master/example/the_valley_compressed.mp4?raw=true');
   }
 
   @override
@@ -74,7 +75,7 @@ class _WatchPortraitState extends BaseState<WatchPortrait> {
     flickManager.handleChangeVideo(VideoPlayerController.network(url));
   }
 
- String balance = "0.0",username='';
+  String balance = "0.0", username = '';
   String a;
   String textPosition;
   String watch;
@@ -82,10 +83,10 @@ class _WatchPortraitState extends BaseState<WatchPortrait> {
   void onSuccess(any, {int reqId}) {
     ProgressBar.instance.hideProgressBar();
     super.onSuccess(any);
-    switch(reqId){
+    switch (reqId) {
       case ResponseIds.CREDIT_BALANCE:
         CreditBalance _response = any as CreditBalance;
-        if(_response.balance != null){
+        if (_response.balance != null) {
           print("success");
           print("success ${_response.balance}");
           setState(() {
@@ -100,6 +101,7 @@ class _WatchPortraitState extends BaseState<WatchPortrait> {
         break;
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -120,7 +122,7 @@ class _WatchPortraitState extends BaseState<WatchPortrait> {
           ],
         ),
       ),
-      body:  SingleChildScrollView(
+      body: SingleChildScrollView(
         child: VisibilityDetector(
           key: ObjectKey(flickManager),
           onVisibilityChanged: (visibility) {
@@ -139,33 +141,39 @@ class _WatchPortraitState extends BaseState<WatchPortrait> {
                   preferredDeviceOrientationFullscreen: [
                     DeviceOrientation.landscapeLeft,
                     DeviceOrientation.landscapeRight,
-
                   ],
                   flickVideoWithControls: FlickVideoWithControls(
-                    controls: CustomOrientationControls(dataManager: dataManager,videoId: widget.VideoId),
+                    controls: CustomOrientationControls(
+                        dataManager: dataManager, videoId: widget.VideoId,yetToWatch: tempYetToWatch),
                   ),
                   flickVideoWithControlsFullscreen: FlickVideoWithControls(
                     videoFit: BoxFit.fitHeight,
-                    controls: CustomOrientationControls(dataManager: dataManager,videoId: widget.VideoId),
+                    controls: CustomOrientationControls(
+                        dataManager: dataManager, videoId: widget.VideoId,yetToWatch: tempYetToWatch),
                   ),
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(left:50.0,right: 50.0, top:30.0),
+                padding:
+                    const EdgeInsets.only(left: 50.0, right: 50.0, top: 30.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     InkWell(
                         onTap: () {
                           Navigator.of(context).push(PageRouteBuilder(
-                              pageBuilder: (_, __, ___) => new WebViewScreen(url: widget.productUrl,title: "Google",)));
+                              pageBuilder: (_, __, ___) => new WebViewScreen(
+                                    url: widget.productUrl,
+                                    title: "Google",
+                                  )));
                           print(widget.productUrl);
                         },
                         child: Image.asset(MyImages.group2)),
                     InkWell(
                         onTap: () {
-                          _watchPortraitProvider.listener= this;
-                          _watchPortraitProvider.performUpdateReaction("1",widget.VideoId);
+                          _watchPortraitProvider.listener = this;
+                          _watchPortraitProvider.performUpdateReaction(
+                              "1", widget.VideoId);
                           Fluttertoast.showToast(
                               msg: "Smile Reaction added ",
                               toastLength: Toast.LENGTH_SHORT,
@@ -173,15 +181,14 @@ class _WatchPortraitState extends BaseState<WatchPortrait> {
                               timeInSecForIosWeb: 1,
                               backgroundColor: Colors.red,
                               textColor: Colors.white,
-                              fontSize: 16.0
-                          );
-
+                              fontSize: 16.0);
                         },
                         child: Image.asset(MyImages.group1)),
                     InkWell(
                         onTap: () {
-                          _watchPortraitProvider.listener= this;
-                          _watchPortraitProvider.performUpdateReaction("0",widget.VideoId);
+                          _watchPortraitProvider.listener = this;
+                          _watchPortraitProvider.performUpdateReaction(
+                              "0", widget.VideoId);
                           Fluttertoast.showToast(
                               msg: "Sad Reaction added ",
                               toastLength: Toast.LENGTH_SHORT,
@@ -189,21 +196,21 @@ class _WatchPortraitState extends BaseState<WatchPortrait> {
                               timeInSecForIosWeb: 1,
                               backgroundColor: Colors.red,
                               textColor: Colors.white,
-                              fontSize: 16.0
-                          );
+                              fontSize: 16.0);
                         },
                         child: Image.asset(MyImages.group3)),
                     InkWell(
                         onTap: () {
                           Navigator.of(context).push(PageRouteBuilder(
                               pageBuilder: (_, __, ___) => new SurveyScreen()));
-
                         },
                         child: Image.asset(MyImages.group4)),
                   ],
                 ),
               ),
-              SizedBox(height: 20.0,),
+              SizedBox(
+                height: 20.0,
+              ),
               Column(
                 children: [
                   Container(
@@ -211,20 +218,28 @@ class _WatchPortraitState extends BaseState<WatchPortrait> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(top: 10.0),
-                          child:
-                          ValueListenableBuilder(
-                            valueListenable: flickManager.flickVideoManager.videoPlayerController,
+                          child: ValueListenableBuilder(
+                            valueListenable: flickManager
+                                .flickVideoManager.videoPlayerController,
                             builder: (context, VideoPlayerValue value, child) {
                               //Do Something with the value.
-                              return Text(value.position.toString().substring(0,7), style: MyStyles.robotoLight60.copyWith(
-                                letterSpacing: 1.0,
-                                color: MyColors.white,),);
+                              tempWatchTime =
+                                  value.position.toString().substring(0, 7);
+                              return Text(
+                                tempWatchTime,
+                                style: MyStyles.robotoLight60.copyWith(
+                                  letterSpacing: 1.0,
+                                  color: MyColors.white,
+                                ),
+                              );
                             },
-                          ),),
+                          ),
+                        ),
                         Padding(
-                          padding: const EdgeInsets.only(left:18.0),
+                          padding: const EdgeInsets.only(left: 18.0),
                           child: Center(
-                            child: Text(MyStrings.minutesThis,
+                            child: Text(
+                              MyStrings.minutesThis,
                               style: MyStyles.robotoMedium12.copyWith(
                                   letterSpacing: 1.0,
                                   color: MyColors.white,
@@ -238,7 +253,6 @@ class _WatchPortraitState extends BaseState<WatchPortrait> {
                     height: 100.0,
                     color: MyColors.lightBlueShade,
                   ),
-
                   Center(
                     child: Container(
                       child: Column(
@@ -248,35 +262,53 @@ class _WatchPortraitState extends BaseState<WatchPortrait> {
                           Padding(
                             padding: const EdgeInsets.only(top: 10.0),
                             child: ValueListenableBuilder(
-                              valueListenable: flickManager.flickVideoManager.videoPlayerController,
-                              builder: (context, VideoPlayerValue value, child) {
-                                //Do Something with the value.
-                                 a = value.position.toString().substring(0,7);
-                                 Duration position = flickManager.flickVideoManager.videoPlayerValue.position;
+                              valueListenable: flickManager
+                                  .flickVideoManager.videoPlayerController,
+                              builder:
+                                  (context, VideoPlayerValue value, child) {
+                                //Do Something with the value.print(value);
+                                a = value.position.toString().substring(0, 7);
+                                Duration position = flickManager
+                                    .flickVideoManager
+                                    .videoPlayerValue
+                                    .position;
 
-                                 String positionInSeconds = position != null
-                                     ? (position - Duration(minutes: position.inMinutes))
-                                     .inSeconds
-                                     .toString()
-                                     .padLeft(2, '0')
-                                     : null;
+                                String positionInSeconds = position != null
+                                    ? (position -
+                                            Duration(
+                                                minutes: position.inMinutes))
+                                        .inSeconds
+                                        .toString()
+                                        .padLeft(2, '0')
+                                    : null;
 
-                                 
-                                 textPosition = position != null ? '${position.inMinutes}.$positionInSeconds' : '0.00';
-                                 var format = DateFormat("HH:mm:ss");
-                                 var one = format.parse(value.position.toString().substring(0,7));
-                                 var two = format.parse(widget.watchtime);
-                               
-                                return Text("${two.difference(one)}".substring(0,7), style: MyStyles.robotoLight60.copyWith(
-                                  letterSpacing: 1.0,
-                                  color: MyColors.white,),);
+                                textPosition = position != null
+                                    ? '${position.inMinutes}.$positionInSeconds'
+                                    : '0.00';
+                                var format = DateFormat("HH:mm:ss");
+                                var one = format.parse(tempWatchTime);
+                                var two = format.parse(widget.watchtime);
+                                print(one.toString() +
+                                    " " +
+                                    two.difference(one).toString());
+                                tempYetToWatch =
+                                    (two.difference(one).toString())
+                                        .substring(0, 8);
+                                return Text(
+                                  tempYetToWatch,
+                                  style: MyStyles.robotoLight60.copyWith(
+                                    letterSpacing: 1.0,
+                                    color: MyColors.white,
+                                  ),
+                                );
                               },
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(left:10.0),
+                            padding: const EdgeInsets.only(left: 10.0),
                             child: Center(
-                              child: Text(MyStrings.yearned,
+                              child: Text(
+                                MyStrings.yearned,
                                 style: MyStyles.robotoMedium12.copyWith(
                                     letterSpacing: 1.0,
                                     color: MyColors.white,
@@ -302,13 +334,15 @@ class _WatchPortraitState extends BaseState<WatchPortrait> {
               InkWell(
                 onTap: () async {
                   // print(double.parse(textPosition));
-                  _watchPortraitProvider.listener= this;
-                  _watchPortraitProvider.performAddBalance(textPosition,widget.VideoId,textPosition);
-                  username  = await SharedPrefManager.instance.getString(Constants.userName);
+                  _watchPortraitProvider.listener = this;
+                  _watchPortraitProvider.performAddBalance(
+                      textPosition, widget.VideoId, textPosition);
+                  username = await SharedPrefManager.instance
+                      .getString(Constants.userName);
                   print(username);
-
                 },
-                child: _submitButton(MyStrings.addtocredit),),
+                child: _submitButton(MyStrings.addtocredit),
+              ),
               SizedBox(
                 height: 30.0,
               ),
@@ -317,9 +351,9 @@ class _WatchPortraitState extends BaseState<WatchPortrait> {
                   // print(double.parse(textPosition));
                   Navigator.of(context).push(PageRouteBuilder(
                       pageBuilder: (_, __, ___) => new DashBoardScreen()));
-
                 },
-                child: _submitButton(MyStrings.enoughForNow),),
+                child: _submitButton(MyStrings.enoughForNow),
+              ),
               SizedBox(
                 height: 30.0,
               ),
@@ -329,6 +363,7 @@ class _WatchPortraitState extends BaseState<WatchPortrait> {
       ),
     );
   }
+
   Widget _DividerPopMenu() {
     return new PopupMenuButton<String>(
         offset: const Offset(0, 30),
@@ -338,7 +373,7 @@ class _WatchPortraitState extends BaseState<WatchPortrait> {
           color: MyColors.accentsColors,
         ),
         itemBuilder: (BuildContext context) {
-          subcontext=context;
+          subcontext = context;
 
           return <PopupMenuEntry<String>>[
             new PopupMenuItem<String>(
@@ -430,8 +465,7 @@ class _WatchPortraitState extends BaseState<WatchPortrait> {
                   onTap: () async {
                     await SharedPrefManager.instance
                         .clearAll()
-                        .whenComplete(
-                            () => print("All set to null"));
+                        .whenComplete(() => print("All set to null"));
 
                     Navigator.of(subcontext).push(PageRouteBuilder(
                         pageBuilder: (_, __, ___) => new WelcomeScreen()));
@@ -461,12 +495,10 @@ class _WatchPortraitState extends BaseState<WatchPortrait> {
           } else if (value == 'value04') {
             Navigator.of(subcontext).push(PageRouteBuilder(
                 pageBuilder: (_, __, ___) => new ChartsDemo()));
-          }
-          else if (value == 'value05') {
+          } else if (value == 'value05') {
             await SharedPrefManager.instance
                 .clearAll()
-                .whenComplete(
-                    () => print("All set to null"));
+                .whenComplete(() => print("All set to null"));
             Navigator.of(subcontext).push(PageRouteBuilder(
                 pageBuilder: (_, __, ___) => new WelcomeScreen()));
           }
@@ -475,190 +507,208 @@ class _WatchPortraitState extends BaseState<WatchPortrait> {
 
   void _showAlertPopupTransparentt() {
     AlertDialog dialog = new AlertDialog(
-      contentPadding: EdgeInsets.only(left:0.0,),
-      content: Stack(
-        children: [
-          Stack(
-            children: [
-              RotatedBox(
-                quarterTurns: 4,
-                child: ClipPath(
-                  clipper: DiagonalPathClipperOne(),
-                  child: Container(
-                    height: 25,
-                    color: MyColors.lightBlueShade,
+      contentPadding: EdgeInsets.only(
+        left: 0.0,
+      ),
+      content: SingleChildScrollView(
+        child: Stack(
+          children: [
+            Stack(
+              children: [
+                RotatedBox(
+                  quarterTurns: 4,
+                  child: ClipPath(
+                    clipper: DiagonalPathClipperOne(),
+                    child: Container(
+                      height: 25,
+                      color: MyColors.lightBlueShade,
+                    ),
                   ),
                 ),
-              ),
-              RotatedBox(
-                quarterTurns: 4,
-                child: ClipPath(
-                  clipper: DiagonalPathClipperTwo(),
-                  child: Container(
-                    height: 25,
-                    color:  MyColors.accentsColors,
+                RotatedBox(
+                  quarterTurns: 4,
+                  child: ClipPath(
+                    clipper: DiagonalPathClipperTwo(),
+                    child: Container(
+                      height: 25,
+                      color: MyColors.accentsColors,
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Stack(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      RotatedBox(
-                        quarterTurns: 3,
-                        child: ClipPath(
-                          clipper: DiagonalPathClipperOne(),
-                          child: Container(
-                            height: 20,
-                            width: 600.0,
-                            color: MyColors.lightBlueShade,),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top:80.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            SizedBox(
-                                height: 150.0,
-                                width: 150.0,
-                                child: Image.asset('assets/images/FoziSmall.png')),
-                            SizedBox(
-                                width: 170.0,
-                                child: Image.asset('assets/images/MaskGroup.png'))
-                          ],
-                        ),
-                      ),
-                      Stack(
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Align(
-                                alignment: Alignment.topRight,
-                                child: RotatedBox(
-                                  quarterTurns: 1,
-                                  child: ClipPath(
-                                    clipper: DiagonalPathClipperOne(),
-                                    child: Container(
-                                      height: 40,
-                                      width: 500.0,
-                                      color: MyColors.lightBlueShade,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(left: 50.0,),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text('Hi $username',
-                                      textAlign: TextAlign.left,
-                                      style: MyStyles.robotoLight30.copyWith(letterSpacing: Dimens.letterSpacing_14, color: MyColors.textColor1b1c20, fontWeight: FontWeight.w100),
-                                    ),
-                                    SizedBox(height: 20.0,),
-                                    Text(MyStrings.congratulations,
-                                      textAlign: TextAlign.left,
-                                      style: MyStyles.robotoBold30.copyWith(letterSpacing: Dimens.letterSpacing_14, color: MyColors.textColor1b1c20, fontWeight: FontWeight.w100),
-                                    ),
-                                    SizedBox(height: 20.0,),
-                                    Padding(
-                                      padding: const EdgeInsets.only(right: 80.0,),
-                                      child: Text(MyStrings.thanksForWatching,
-                                        style: MyStyles.robotoMedium18.copyWith(letterSpacing: 1.0, height: 1.5, color: MyColors.textColor1b1c20, fontWeight: FontWeight.w100),
-                                        textAlign: TextAlign.left,),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top:50.0, bottom: 50.0),
-                                child: Center(
-                                  child: InkWell(
-                                      onTap: () {
-                                        // Navigator.of(context).push(PageRouteBuilder(
-                                        //     pageBuilder: (_, __, ___) => new DemographicsScreen()));
-                                        // Navigator.push(context, MaterialPageRoute(builder: (context) => WelcomeScreen()));
-                                      },
-                                      child: _submitButton(MyStrings.getGiftCard)),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left:25.0, right: 25.0),
-                                child: Text(MyStrings.youWillBeNotified,
-                                  style: MyStyles.robotoMedium16.copyWith(letterSpacing: 1.0, color: MyColors.textColor1b1c20, fontWeight: FontWeight.w100),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              RotatedBox(
-                                quarterTurns:3,
-                                child: ClipPath(
-                                  clipper: DiagonalPathClipperTwo(),
-                                  child: Container(
-                                    height: 40,
-                                    width: 500.0,
-                                    color: MyColors.accentsColors,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      Align(
-                        alignment: Alignment.topRight,
-                        child: RotatedBox(
-                          quarterTurns: 1,
+              ],
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Stack(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        RotatedBox(
+                          quarterTurns: 3,
                           child: ClipPath(
-                            clipper: DiagonalPathClipperTwo(),
+                            clipper: DiagonalPathClipperOne(),
                             child: Container(
                               height: 20,
-                              width: 400.0,
-                              color: MyColors.accentsColors,
+                              width: 600.0,
+                              color: MyColors.lightBlueShade,
                             ),
                           ),
                         ),
-                      ),
-
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 80.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              SizedBox(
+                                  height: 150.0,
+                                  width: 150.0,
+                                  child: Image.asset(
+                                      'assets/images/FoziSmall.png')),
+                              SizedBox(
+                                  width: 170.0,
+                                  child: Image.asset(
+                                      'assets/images/MaskGroup.png'))
+                            ],
+                          ),
+                        ),
+                        Stack(
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Align(
+                                  alignment: Alignment.topRight,
+                                  child: RotatedBox(
+                                    quarterTurns: 1,
+                                    child: ClipPath(
+                                      clipper: DiagonalPathClipperOne(),
+                                      child: Container(
+                                        height: 40,
+                                        width: 500.0,
+                                        color: MyColors.lightBlueShade,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    left: 50.0,
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Hi $username',
+                                        textAlign: TextAlign.left,
+                                        style: MyStyles.robotoLight30.copyWith(
+                                            letterSpacing:
+                                                Dimens.letterSpacing_14,
+                                            color: MyColors.textColor1b1c20,
+                                            fontWeight: FontWeight.w100),
+                                      ),
+                                      SizedBox(
+                                        height: 20.0,
+                                      ),
+                                      Text(
+                                        MyStrings.congratulations,
+                                        textAlign: TextAlign.left,
+                                        style: MyStyles.robotoBold30.copyWith(
+                                            letterSpacing:
+                                                Dimens.letterSpacing_14,
+                                            color: MyColors.textColor1b1c20,
+                                            fontWeight: FontWeight.w100),
+                                      ),
+                                      SizedBox(
+                                        height: 20.0,
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          right: 80.0,
+                                        ),
+                                        child: Text(
+                                          MyStrings.thanksForWatching,
+                                          style: MyStyles.robotoMedium26
+                                              .copyWith(
+                                                  letterSpacing: 1.0,
+                                                  height: 1.5,
+                                                  color:
+                                                      MyColors.textColor1b1c20,
+                                                  fontWeight: FontWeight.w100),
+                                          textAlign: TextAlign.left,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                RotatedBox(
+                                  quarterTurns: 3,
+                                  child: ClipPath(
+                                    clipper: DiagonalPathClipperTwo(),
+                                    child: Container(
+                                      height: 20,
+                                      width: 500.0,
+                                      color: MyColors.accentsColors,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Align(
+                          alignment: Alignment.topRight,
+                          child: RotatedBox(
+                            quarterTurns: 1,
+                            child: ClipPath(
+                              clipper: DiagonalPathClipperTwo(),
+                              child: Container(
+                                height: 10,
+                                width: 400.0,
+                                color: MyColors.accentsColors,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
-      insetPadding: EdgeInsets.only(left:25.0,right: 25.0,top: 10.0,bottom: 52
-      ),
+      insetPadding:
+          EdgeInsets.only(left: 25.0, right: 25.0, top: 10.0, bottom: 0),
       // backgroundColor: MyColors.accentsColors.withOpacity(0.8),
     );
-    showDialog(context: context, builder: (context) => dialog,);
+    showDialog(
+      context: context,
+      builder: (context) => dialog,
+    );
   }
 }
 
@@ -680,8 +730,10 @@ Widget _submitButton(String buttonName) {
         color: MyColors.primaryColor),
     child: Text(
       buttonName,
-      style: MyStyles.robotoMedium14.copyWith(letterSpacing: 3.0, color: MyColors.white, fontWeight: FontWeight.w500),
-
+      style: MyStyles.robotoMedium14.copyWith(
+          letterSpacing: 3.0,
+          color: MyColors.white,
+          fontWeight: FontWeight.w500),
     ),
   );
 }

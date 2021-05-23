@@ -59,7 +59,7 @@ class _LoginScreenState extends BaseState<LoginScreen> {
   }
 
   @override
-  void onSuccess(any, {int reqId}) {
+  Future<void> onSuccess(any, {int reqId}) async {
     ProgressBar.instance.hideProgressBar();
     super.onSuccess(any);
     switch (reqId) {
@@ -67,10 +67,12 @@ class _LoginScreenState extends BaseState<LoginScreen> {
         SignInResponse _response = any as SignInResponse;
         if (_response.userid != null) {
           // print("success");
-          SharedPrefManager.instance
+          await SharedPrefManager.instance
               .setString(Constants.userId, _response.userid);
-          SharedPrefManager.instance
+          await SharedPrefManager.instance
               .setString(Constants.userName, _response.username);
+          await SharedPrefManager.instance
+              .setString(Constants.userEmail, _response.useremail);
           print(
               "userid ${SharedPrefManager.instance.getString(Constants.userId)}");
           print("success ${_response.username}");
